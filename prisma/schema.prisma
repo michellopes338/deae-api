@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id            String  @id @default(uuid())
+  username      String  @unique
+  email         String  @unique
+  password      String
+  role          Role    @default(USER)
+  refresh_token String?
+  deae          Deae[]
+
+  @@map("users")
+}
+
+model Deae {
+  id               String         @id @default(uuid())
+  userId           String
+  classificationId String
+  localId          String
+  statusId         String
+  deviation        String
+  adjustment       String
+  is_valid Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  classification   Classification @relation(fields: [classificationId], references: [id])
+  local            Local          @relation(fields: [localId], references: [id])
+  status           Status         @relation(fields: [statusId], references: [id])
+  user             Users          @relation(fields: [userId], references: [id])
+
+  @@map("deaes")
+}
+
+model Classification {
+  id    String @id @default(uuid())
+  label String @unique
+  deae  Deae[]
+
+  @@map("classifications")
+}
+
+model Local {
+  id    String @id @default(uuid())
+  label String @unique
+  deae  Deae[]
+
+  @@map("locals")
+}
+
+model Status {
+  id    String @id @default(uuid())
+  label String @unique
+  deae  Deae[]
+
+  @@map("status")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
