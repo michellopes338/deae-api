@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { DeaesService } from './deaes.service';
 import { InsertDeae, UpdateDeae, UserFromRequest } from './dto/deae.dto';
-import { Scope } from '../interfaces/query.dto';
+import { QuerySearch, Scope } from '../interfaces/query.dto';
 // import { Response as ResponseExpressType } from 'express';
 
 @Controller('deaes')
@@ -34,8 +34,8 @@ export class DeaesController {
   }
 
   @Get()
-  async findAll(@Query() { limit = 20, offset = 0 }: Scope) {
-    const deaes = this.deaesService.findAll({ limit, offset });
+  async findAll(@Query() querySearch: QuerySearch) {
+    const deaes = this.deaesService.findAll(querySearch);
 
     return deaes;
   }
@@ -50,6 +50,10 @@ export class DeaesController {
     const deaes = await this.deaesService.findAllByUser({
       userId: user.userId,
       scope: { limit, offset },
+    });
+
+    deaes.forEach((element: { created_at: Date }) => {
+      console.log(element.created_at);
     });
 
     return deaes;

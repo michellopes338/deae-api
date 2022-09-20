@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { Scope } from '../../interfaces/query.dto';
 import {
   CreateSelectables,
@@ -10,20 +11,22 @@ export abstract class SelectablesService {
   }
 
   async create(newLocal: CreateSelectables): Promise<any> {
-    return this.modelDelegate.create({ data: newLocal });
+    try {
+      return await this.modelDelegate.create({ data: newLocal });
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new BadRequestException('Esse selecionavel já existe');
+      }
+    }
   }
 
   async findAll({ limit, offset }: Scope): Promise<any[]> {
-    const data = await this.modelDelegate.findMany({
-      take: limit,
-      skip: offset,
-    });
+    const data = await this.modelDelegate.findMany();
 
     return data;
   }
 
   async update({ id, newSelectable }: UpdateSelectablesParams): Promise<any> {
-    console.log(newSelectable, id);
     return this.modelDelegate.update({
       where: { id },
       data: { ...newSelectable },
@@ -31,6 +34,12 @@ export abstract class SelectablesService {
   }
 
   async delete(localId: string) {
-    return this.modelDelegate.delete({ where: { id: localId } });
+    try {
+      return await this.modelDelegate.delete({ where: { id: localId } });
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new BadRequestException('Selecionavel não existe');
+      }
+    }
   }
 }

@@ -40,10 +40,6 @@ export class UsersService {
       where: { username },
     });
 
-    if (!user) {
-      throw new NotFoundException();
-    }
-
     return user;
   }
 
@@ -63,11 +59,9 @@ export class UsersService {
     newRefreshToken,
     userId,
   }: RefreshTokenInsertion): Promise<void> {
-    const hashedRefreshToken = await bcrypt.hash(newRefreshToken, 13);
-
     await this.prisma.users.update({
       where: { id: userId },
-      data: { refresh_token: hashedRefreshToken },
+      data: { refresh_token: newRefreshToken },
     });
   }
 

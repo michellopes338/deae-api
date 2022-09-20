@@ -42,7 +42,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload, {
-        expiresIn: '3h',
+        expiresIn: '15m',
       }),
     };
   }
@@ -56,6 +56,7 @@ export class AuthService {
       username,
       sub,
       role,
+      date_login: new Date(),
     };
 
     return {
@@ -68,14 +69,16 @@ export class AuthService {
   async checkRefreshToken({
     requestRefreshToken,
     userId,
-  }: CheckRefreshToken): Promise<boolean> {
-    const { refresh_token } = await this.userService.findOneById(userId);
-
-    const isRefreshTokenValid = await bcrypt.compare(
-      requestRefreshToken,
+  }: CheckRefreshToken): Promise<any> {
+    const {
       refresh_token,
-    );
+      username,
+      id: sub,
+      role,
+    } = await this.userService.findOneById(userId);
 
-    return isRefreshTokenValid;
+    const isRefreshTokenValid = requestRefreshToken === refresh_token;
+
+    return { isRefreshTokenValid, user: { username, sub, role } };
   }
 }

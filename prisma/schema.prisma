@@ -27,13 +27,13 @@ model Deae {
   statusId         String
   deviation        String
   adjustment       String
-  is_valid Boolean @default(false)
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  classification   Classification @relation(fields: [classificationId], references: [id])
-  local            Local          @relation(fields: [localId], references: [id])
-  status           Status         @relation(fields: [statusId], references: [id])
-  user             Users          @relation(fields: [userId], references: [id])
+  is_valid         Boolean        @default(false)
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @default(now())
+  classification   Classification @relation(fields: [classificationId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  local            Local          @relation(fields: [localId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status           Status         @relation(fields: [statusId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user             Users          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("deaes")
 }

@@ -6,8 +6,26 @@ import {
   FindAllByUserParams,
   UpdateDeaeParams,
 } from './dto/deae.dto';
-import { Scope } from '../interfaces/query.dto';
+import { QuerySearch, Scope } from '../interfaces/query.dto';
 import { Deae } from '@prisma/client';
+
+const select = {
+  id: true,
+  adjustment: true,
+  classification: true,
+  deviation: true,
+  local: true,
+  status: true,
+  created_at: true,
+  is_valid: true,
+  user: {
+    select: {
+      id: true,
+      username: true,
+      email: true,
+    },
+  },
+};
 
 @Injectable()
 export class DeaesService {
@@ -21,10 +39,44 @@ export class DeaesService {
     return insertedDeae;
   }
 
-  async findAll({ limit, offset }: Scope): Promise<Deae[]> {
+  async findAll({
+    limit = 20,
+    offset = 0,
+    fields,
+    search,
+    order,
+  }: QuerySearch): Promise<any> {
+    if (!fields) {
+      return await this.prisma.deae.findMany({
+        select,
+        take: Number(limit),
+        skip: Number(offset),
+        orderBy: { created_at: order },
+      });
+    }
+
+    const searchObject =
+      search === 'true' || search === 'false'
+        ? { equals: search === 'true' }
+        : { contains: search };
+
+    const arrayFields = fields.split('.');
+    const objectSearch = arrayFields.reduceRight(
+      (object, next, index) =>
+        index + 1 !== arrayFields.length
+          ? { [next]: object }
+          : { [next]: searchObject },
+      {},
+    );
+
+    console.log(objectSearch);
+
     const deaes = await this.prisma.deae.findMany({
-      take: limit,
-      skip: offset,
+      select,
+      where: objectSearch,
+      take: Number(limit),
+      skip: Number(offset),
+      orderBy: { created_at: order },
     });
 
     return deaes;
@@ -51,21 +103,7 @@ export class DeaesService {
   async findOneRelationed(id: string): Promise<any> {
     const deae = await this.prisma.deae.findUnique({
       where: { id },
-      select: {
-        id: true,
-        adjustment: true,
-        classification: true,
-        deviation: true,
-        local: true,
-        status: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-      },
+      select,
     });
 
     return deae;
@@ -79,11 +117,13 @@ export class DeaesService {
     return deae;
   }
 
-  async findAllByUser({ userId, scope }: FindAllByUserParams): Promise<Deae[]> {
+  async findAllByUser({ userId, scope }: FindAllByUserParams): Promise<any> {
     return this.prisma.deae.findMany({
       where: { userId: userId },
       take: scope.limit,
       skip: scope.offset,
+      select,
+      orderBy: { created_at: 'desc' },
     });
   }
 

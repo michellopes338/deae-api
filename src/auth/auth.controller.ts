@@ -5,6 +5,7 @@ import {
   Request,
   Response,
   ForbiddenException,
+  HttpCode,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -13,8 +14,13 @@ import {
   Response as ResponseExpressType,
 } from 'express';
 import { UsersService } from '../users/users.service';
-import { Public } from 'src/decorators/public.decorator';
-import { Payload } from 'src/interfaces/jwt.interface';
+import { Public } from '../decorators/public.decorator';
+import {
+  Payload,
+  RefreshToken,
+  RefreshTokenWithPayload,
+} from '../interfaces/jwt.interface';
+import { JwtRefreshGuard } from './guards/refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -51,19 +57,12 @@ export class AuthController {
     response.status(200).send({ refresh_token });
   }
 
+  @Public()
+  @HttpCode(200)
+  @UseGuards(JwtRefreshGuard)
   @Post('refresh')
-  async updateToken(
-    @Request() request: any,
-    @Response() response: ResponseExpressType,
-  ) {
-    const refresh: string = request.headers.refresh;
-    const user: Payload = request.user;
-
-    const isRefreshTokenValid = await this.authService.checkRefreshToken({
-      requestRefreshToken: refresh,
-      userId: user.sub,
-    });
-
+  async updateToken(@Request() request: any) {
+    const { isRefreshTokenValid, user }: RefreshTokenWithPayload = request.user;
     if (!isRefreshTokenValid) {
       await this.usersService.popRefreshToken(user.sub);
       throw new ForbiddenException();
@@ -77,8 +76,11 @@ export class AuthController {
       ...user,
     });
 
-    response.header('Authorization', access_token);
+    await this.usersService.insertRefreshTokenOnDatabase({
+      newRefreshToken: refresh_token,
+      userId: user.sub,
+    });
 
-    return response.status(200).send({ refresh_token });
+    return { access_token, refresh_token };
   }
 }

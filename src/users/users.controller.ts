@@ -1,15 +1,6 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUser, OutCreatedUser } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { Users } from '@prisma/client';
 import { Public } from '../decorators/public.decorator';
 
@@ -26,5 +17,10 @@ export class UsersController {
   @Get()
   async findOne(@Body() username: string): Promise<Users> {
     return this.usersService.findOne(username);
+  }
+
+  @Get('permission')
+  async permission(@Req() request: any) {
+    return { role: request.user.role };
   }
 }

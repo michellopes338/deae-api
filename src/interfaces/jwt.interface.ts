@@ -11,6 +11,11 @@ export interface RefreshTokenInsertion {
   newRefreshToken: string;
 }
 
+export interface RefreshTokenWithPayload {
+  isRefreshTokenValid: boolean;
+  user: Payload;
+}
+
 export interface RefreshToken {
   refresh_token: string;
 }

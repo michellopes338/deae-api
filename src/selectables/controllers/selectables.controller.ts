@@ -34,7 +34,6 @@ export abstract class SelectablesController {
     @Body() newSelectable: UpdateSelectables,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
-    console.log(newSelectable);
     return await this.service.update({ newSelectable, id });
   }
 
