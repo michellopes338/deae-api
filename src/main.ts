@@ -5,6 +5,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -18,6 +19,9 @@ async function bootstrap() {
     'http://127.0.0.1:3000',
     'http://10.0.0.102:3000',
   ];
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
+
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || whitelist.indexOf(origin) !== -1) {
