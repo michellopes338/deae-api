@@ -6,7 +6,7 @@ import {
   FindAllByUserParams,
   UpdateDeaeParams,
 } from './dto/deae.dto';
-import { QuerySearch, Scope } from '../interfaces/query.dto';
+import { QuerySearch } from '../interfaces/query.dto';
 import { Deae } from '@prisma/client';
 
 const select = {
