@@ -19,7 +19,11 @@ async function bootstrap() {
     'http://10.0.0.102:3000',
   ];
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      }
+    },
     exposedHeaders: 'Authorization',
   });
   app.useGlobalPipes(
