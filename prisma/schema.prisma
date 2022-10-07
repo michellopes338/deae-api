@@ -3,14 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model Users {
-  id            String  @id @default(uuid())
+  id            String  @id @default(uuid()) @map("_id")
   username      String  @unique
   email         String  @unique
+  verified_email Boolean @default(false)
   password      String
   role          Role    @default(USER)
   refresh_token String?
@@ -20,7 +21,7 @@ model Users {
 }
 
 model Deae {
-  id               String         @id @default(uuid())
+  id               String         @id @default(uuid()) @map("_id")
   userId           String
   classificationId String
   localId          String
@@ -39,7 +40,7 @@ model Deae {
 }
 
 model Classification {
-  id    String @id @default(uuid())
+  id    String @id @default(uuid()) @map("_id")
   label String @unique
   deae  Deae[]
 
@@ -47,7 +48,7 @@ model Classification {
 }
 
 model Local {
-  id    String @id @default(uuid())
+  id    String @id @default(uuid()) @map("_id")
   label String @unique
   deae  Deae[]
 
@@ -55,7 +56,7 @@ model Local {
 }
 
 model Status {
-  id    String @id @default(uuid())
+  id    String @id @default(uuid()) @map("_id")
   label String @unique
   deae  Deae[]
 

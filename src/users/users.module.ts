@@ -1,7 +1,7 @@
-import { Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Module } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { UsersController } from './users.controller';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { JwtAuthUserGuard } from '../auth/guards/jwt-auth.guard';
 import { PrismaModule } from 'src/prisma/prisma.module';
 
@@ -13,6 +13,10 @@ import { PrismaModule } from 'src/prisma/prisma.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthUserGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
     },
   ],
   exports: [UsersService],

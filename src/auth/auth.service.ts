@@ -70,15 +70,8 @@ export class AuthService {
     requestRefreshToken,
     userId,
   }: CheckRefreshToken): Promise<any> {
-    const {
-      refresh_token,
-      username,
-      id: sub,
-      role,
-    } = await this.userService.findOneById(userId);
-
+    const { refresh_token } = await this.userService.findOneById(userId);
     const isRefreshTokenValid = requestRefreshToken === refresh_token;
-
-    return { isRefreshTokenValid, user: { username, sub, role } };
+    return isRefreshTokenValid;
   }
 }

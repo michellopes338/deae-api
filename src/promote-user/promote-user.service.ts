@@ -7,10 +7,8 @@ import { User } from 'src/users/entities/user.entity';
 export class PromoteUserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async execute(
-    userPretendedId: string,
-  ): Promise<Omit<User, 'password' | 'refresh_token'>> {
-    return await this.prisma.users.update({
+  async execute(userPretendedId: string): Promise<User> {
+    const user = await this.prisma.users.update({
       where: { id: userPretendedId },
       data: { role: Role.ADMIN },
       select: {
@@ -20,5 +18,7 @@ export class PromoteUserService {
         role: true,
       },
     });
+
+    return new User(user);
   }
 }

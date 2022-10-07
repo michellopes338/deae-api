@@ -47,12 +47,15 @@ export class DeaesService {
     order,
   }: QuerySearch): Promise<any> {
     if (!fields) {
-      return await this.prisma.deae.findMany({
+      console.log('deaes');
+      const deaes = await this.prisma.deae.findMany({
         select,
         take: Number(limit),
         skip: Number(offset),
         orderBy: { created_at: order },
       });
+
+      return deaes;
     }
 
     const searchObject =
@@ -68,9 +71,6 @@ export class DeaesService {
           : { [next]: searchObject },
       {},
     );
-
-    console.log(objectSearch);
-
     const deaes = await this.prisma.deae.findMany({
       select,
       where: objectSearch,

@@ -6,7 +6,7 @@ export class CreateSelectables {
   id: string;
 
   @IsString()
-  @Length(5, 64)
+  @Length(4, 64)
   label: string;
 
   @Exclude()

@@ -31,11 +31,16 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate(request: Request, payload: Payload) {
+  async validate(request: Request, { role, sub, username }: Payload) {
     const refreshToken: string = request.headers.refresh.toString();
-    return this.authService.checkRefreshToken({
+    const isRefreshTokenValid = await this.authService.checkRefreshToken({
       requestRefreshToken: refreshToken,
-      userId: payload.sub,
+      userId: sub,
     });
+
+    return {
+      isRefreshTokenValid,
+      user: { username, id: sub, role },
+    };
   }
 }

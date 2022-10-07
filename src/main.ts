@@ -13,7 +13,11 @@ async function bootstrap() {
       logger: true,
     }),
   );
-  const whitelist = ['http://localhost:3000', 'http://127.0.0.1:3000'];
+  const whitelist = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://10.0.0.102:3000',
+  ];
   app.enableCors({
     origin: (origin, callback) => {
       if (!origin || whitelist.indexOf(origin) !== -1) {
@@ -28,6 +32,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  await app.listen(8000);
+  await app.listen(8000, '0.0.0.0');
 }
 bootstrap();

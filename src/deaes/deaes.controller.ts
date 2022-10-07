@@ -52,10 +52,6 @@ export class DeaesController {
       scope: { limit, offset },
     });
 
-    deaes.forEach((element: { created_at: Date }) => {
-      console.log(element.created_at);
-    });
-
     return deaes;
   }
 

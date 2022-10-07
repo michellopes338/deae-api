@@ -32,10 +32,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(
-    @Request() request: any,
-    @Response() response: ResponseExpressType,
-  ) {
+  async login(@Request() request: any) {
     const { username, id: sub, role } = request.user;
     const { access_token } = await this.authService.generateAccessToken({
       username,
@@ -53,8 +50,7 @@ export class AuthController {
       userId: sub,
     });
 
-    response.header('Authorization', access_token);
-    response.status(200).send({ refresh_token });
+    return { access_token, refresh_token };
   }
 
   @Public()
@@ -62,25 +58,14 @@ export class AuthController {
   @UseGuards(JwtRefreshGuard)
   @Post('refresh')
   async updateToken(@Request() request: any) {
-    const { isRefreshTokenValid, user }: RefreshTokenWithPayload = request.user;
+    const { isRefreshTokenValid, ...restRequest }: RefreshTokenWithPayload =
+      request.user;
+
     if (!isRefreshTokenValid) {
-      await this.usersService.popRefreshToken(user.sub);
+      await this.usersService.popRefreshToken(request.user.user.id);
       throw new ForbiddenException();
     }
 
-    const { access_token } = await this.authService.generateAccessToken({
-      ...user,
-    });
-
-    const { refresh_token } = await this.authService.generateRefreshToken({
-      ...user,
-    });
-
-    await this.usersService.insertRefreshTokenOnDatabase({
-      newRefreshToken: refresh_token,
-      userId: user.sub,
-    });
-
-    return { access_token, refresh_token };
+    return this.login(restRequest);
   }
 }
