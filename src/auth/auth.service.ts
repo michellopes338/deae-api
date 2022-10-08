@@ -22,7 +22,7 @@ export class AuthService {
     password,
   }: UserCredentials): Promise<OutValidUser | null> {
     const user = await this.userService.findOne(username);
-    const isUserValid = user && bcrypt.compare(password, user.password);
+    const isUserValid = user && (await bcrypt.compare(password, user.password));
 
     if (isUserValid) {
       const { password, ...response } = user;
