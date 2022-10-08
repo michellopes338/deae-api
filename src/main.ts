@@ -18,6 +18,7 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://10.0.0.102:3000',
+    'https://deae-web-next-bkdqf55zh-michellopes338.vercel.app',
   ];
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
