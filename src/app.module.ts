@@ -1,4 +1,8 @@
-import { Module } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  Module,
+  CacheModule,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaService } from './prisma/prisma.service';
@@ -10,6 +14,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ValidateDeaeModule } from './validate-deae/validate-deae.module';
 import { PromoteUserModule } from './promote-user/promote-user.module';
 import { DescentUserModule } from './descent-user/descent-user.module';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthUserGuard } from './auth/guards/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -21,8 +28,24 @@ import { DescentUserModule } from './descent-user/descent-user.module';
     ValidateDeaeModule,
     PromoteUserModule,
     DescentUserModule,
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
+    CacheModule.register(),
   ],
   controllers: [AppController],
-  providers: [AppService, PrismaService],
+  providers: [
+    AppService,
+    PrismaService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthUserGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ClassSerializerInterceptor,
+    },
+  ],
 })
 export class AppModule {}

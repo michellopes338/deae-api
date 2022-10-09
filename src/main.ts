@@ -6,6 +6,8 @@ import {
 } from '@nestjs/platform-fastify';
 import { ValidationPipe } from '@nestjs/common';
 import { PrismaService } from './prisma/prisma.service';
+import helmet from '@fastify/helmet';
+// import fastifyCsrf from 'fastify-csrf';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -24,11 +26,7 @@ async function bootstrap() {
   await prismaService.enableShutdownHooks(app);
 
   app.enableCors({
-    origin: (origin, callback) => {
-      if (!origin || whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      }
-    },
+    origin: '*',
     exposedHeaders: 'Authorization',
   });
   app.useGlobalPipes(
@@ -37,6 +35,8 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  await app.register(helmet);
+  // await app.register(fastifyCsrf);
   await app.listen(process.env.PORT || 8000, '0.0.0.0');
 }
 bootstrap();
