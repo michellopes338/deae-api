@@ -22,6 +22,8 @@ async function bootstrap() {
     'http://10.0.0.102:3000',
     'https://deae-web-next-bkdqf55zh-michellopes338.vercel.app:443',
     'https://deae-web-next-bkdqf55zh-michellopes338.vercel.app:8443',
+    'https://deae-web-next-bkdqf55zh-michellopes338.vercel.app',
+    'https://3000-michellopes-deaewebnext-tu4ew97v79e.ws-us70.gitpod.io',
   ];
   const prismaService = app.get(PrismaService);
   await prismaService.enableShutdownHooks(app);
