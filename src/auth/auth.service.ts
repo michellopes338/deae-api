@@ -42,7 +42,7 @@ export class AuthService {
 
     return {
       access_token: this.jwtService.sign(payload, {
-        expiresIn: '15m',
+        expiresIn: '1m',
       }),
     };
   }
